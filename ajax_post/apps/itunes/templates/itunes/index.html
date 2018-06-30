@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ajax Posts</title>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        #image{
+            display:none;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+
+            $('form').submit(function(){
+                $('#image').show()
+                $.post(
+                    $(this).attr('action'),
+                    $(this).serialize(),
+                    function(resp){
+                        console.log('the response object:');
+                        console.log(resp);
+                        var html_string = "";
+                        if (resp.results.length !== 0){
+                            html_string = "<video controls src='" + resp.results[0].previewUrl + "'></video>";
+                        }
+                        else{
+                            html_string = "Not Found";
+                        }
+                        console.log('the html string:');
+                        console.log(html_string);
+                        $('#results').html(html_string);
+                    },
+                    'json'
+                );
+                $('#image').hide()
+                return false;
+            });
+
+        })
+    </script>
+</head>
+<body>
+    <h1>Enter Artist's Name:</h1>
+    <div id='image'>
+        {% load static %}
+        <img src="{% static "itunes/ajax-loading-gif-7.gif" %}" alt='loader'>
+    </div>
+    <form action="/itunes/get_movie" method='post'>
+        {% csrf_token %}
+        <label for='user_input'>Enter Artist's Name:</label>
+        <input id='user_input' name='user_input' type='search'>
+        <input type='submit' value='search'>
+    </form>
+    <div id='results'></div>
+</body>
+</html>
